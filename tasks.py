@@ -7,6 +7,7 @@ from RPA.PDF import PDF
 from RPA.Archive import Archive
 import os
 import time
+from RPA.Assistant import Assistant
 @task
 def order_robots_from_RobotSpareBin():
     """
@@ -19,15 +20,16 @@ def order_robots_from_RobotSpareBin():
     browser.configure(
         slowmo=1000,
     )
-    open_website()
+    # open_website()
+    user_input_task()
     pass_pop_up()
-    #web_download_csv()
+    web_download_csv()
     orders = read_csv_file()
     process_order(orders)
     
 
 def open_website():
-    """Navigates to the given URL"""
+    """Navigates to the given URL""" 
     browser.goto("https://robotsparebinindustries.com/#/robot-order")
 
 def pass_pop_up():
@@ -179,9 +181,14 @@ def wait_for_file(filepath, timeout=5):
             raise TimeoutError(f"File {filepath} not found after {timeout} seconds.")
         time.sleep(0.1)
 
-        # head_item_id = order["Head"]
-        # head_model_name = model_mapping.get(head_item_id, "")
-        # # Now you can use head_model_name or head_item_id as needed
-        # # Example: select the head by part number
-        # page.select_option("#head", head_model_name)
-        # # Continue filling the rest of the form...
+def user_input_task():
+    assistant = Assistant()
+    assistant.add_heading("Input from user")
+    assistant.add_text_input("text_input", placeholder="Please enter URL")
+    assistant.add_submit_buttons("Submit", default="Submit")
+    result = assistant.run_dialog()
+    url = result.text_input
+    open_robot_order_website(url)
+
+def open_robot_order_website(url):
+    browser.goto(url)
